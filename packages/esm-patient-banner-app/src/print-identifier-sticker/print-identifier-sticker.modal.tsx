@@ -96,15 +96,13 @@ const PrintIdentifierSticker: React.FC<PrintIdentifierStickerProps> = ({ closeMo
         }
       `}
           </style>
-          <div className={styles.header}>
-            <div className={styles.printedBy}>
-              {t('printedBy', 'Printed by')}{' '}
-              <span>
-                {session.user.display} {t('onDate', 'on')} {formatDate(new Date(), { noToday: true })}
-              </span>
-            </div>
-            <PrintComponent patient={patient} />
+          <div className={styles.printedBy}>
+            <span>
+              {t('printedBy', 'Printed by')} {session.user.display} {t('onDate', 'on')}{' '}
+              {formatDate(new Date(), { noToday: true })}
+            </span>
           </div>
+          <PrintComponent patient={patient} />
         </div>
       </ModalBody>
       <ModalFooter>
