@@ -7,6 +7,7 @@ import {
   useLocations,
   useConfig,
   getDefaultsFromConfigSchema,
+  OpenmrsDatePicker,
 } from '@openmrs/esm-framework';
 import { mockCareProgramsResponse, mockEnrolledProgramsResponse, mockLocationsResponse } from '__mocks__';
 import { mockPatient } from 'tools';
@@ -18,6 +19,7 @@ import {
 } from './programs.resource';
 import ProgramsForm from './programs-form.workspace';
 import { type ConfigObject, configSchema } from '../config-schema';
+import dayjs from 'dayjs';
 
 const mockUseAvailablePrograms = jest.mocked(useAvailablePrograms);
 const mockUseEnrollments = jest.mocked(useEnrollments);
@@ -29,6 +31,26 @@ const mockCloseWorkspace = jest.fn();
 const mockCloseWorkspaceWithSavedChanges = jest.fn();
 const mockPromptBeforeClosing = jest.fn();
 const mockUseConfig = jest.mocked(useConfig<ConfigObject>);
+
+const mockOpenmrsDatePicker = jest.mocked(OpenmrsDatePicker);
+
+mockOpenmrsDatePicker.mockImplementation(({ id, labelText, value, onChange, isInvalid, invalidText }) => {
+  const formattedValue = value ? dayjs().format('DD/MM/YY') : '';
+
+  return (
+    <>
+      <label htmlFor={id}>{labelText}</label>
+      <input
+        id={id}
+        value={formattedValue}
+        onChange={(evt) => {
+          onChange(dayjs(evt.target.value, 'DD/MM/YYYY').toDate());
+        }}
+      />
+      {isInvalid && <span>{invalidText}</span>}
+    </>
+  );
+});
 
 const testProps = {
   closeWorkspace: mockCloseWorkspace,

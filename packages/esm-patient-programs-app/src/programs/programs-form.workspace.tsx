@@ -4,8 +4,6 @@ import dayjs from 'dayjs';
 import {
   Button,
   ButtonSet,
-  DatePicker,
-  DatePickerInput,
   Form,
   FormGroup,
   InlineLoading,
@@ -18,7 +16,15 @@ import {
 import { z } from 'zod';
 import { useForm, Controller, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { parseDate, showSnackbar, useConfig, useLayoutType, useLocations, useSession } from '@openmrs/esm-framework';
+import {
+  parseDate,
+  showSnackbar,
+  useConfig,
+  useLayoutType,
+  useLocations,
+  useSession,
+  OpenmrsDatePicker,
+} from '@openmrs/esm-framework';
 import { type DefaultPatientWorkspaceProps } from '@openmrs/esm-patient-common-lib';
 import {
   createProgramEnrollment,
@@ -194,18 +200,14 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="enrollmentDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="enrollment date"
+        <OpenmrsDatePicker
           id="enrollmentDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="enrollmentDateInput" labelText={t('dateEnrolled', 'Date enrolled')} />
-        </DatePicker>
+          label={t('dateEnrolled', 'Date enrolled')}
+          value={value ? dayjs(value).toDate() : null}
+          onChange={(date) => onChange(date)}
+          maxDate={new Date()}
+          className={styles.datePicker}
+        />
       )}
     />
   );
@@ -215,19 +217,15 @@ const ProgramsForm: React.FC<ProgramsFormProps> = ({
       name="completionDate"
       control={control}
       render={({ field: { onChange, value } }) => (
-        <DatePicker
-          aria-label="completion date"
+        <OpenmrsDatePicker
           id="completionDate"
-          datePickerType="single"
-          dateFormat="d/m/Y"
-          minDate={new Date(watch('enrollmentDate')).toISOString()}
-          maxDate={new Date().toISOString()}
-          placeholder="dd/mm/yyyy"
-          onChange={([date]) => onChange(date)}
-          value={value}
-        >
-          <DatePickerInput id="completionDateInput" labelText={t('dateCompleted', 'Date completed')} />
-        </DatePicker>
+          label={t('dateCompleted', 'Date completed')}
+          value={value ? dayjs(value).toDate() : null}
+          onChange={(date) => onChange(date)}
+          minDate={dayjs(watch('enrollmentDate')).toDate()}
+          maxDate={new Date()}
+          className={styles.datePicker}
+        />
       )}
     />
   );
