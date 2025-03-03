@@ -208,7 +208,6 @@ const AttributeTypeField: React.FC<AttributeTypeFieldProps> = ({
             {...fieldProps}
             id={`date-picker-${uuid}`}
             labelText={labelText}
-            aria-invalid={!!fieldState?.error?.message}
             invalidText={fieldState?.error?.message}
           />
         );
