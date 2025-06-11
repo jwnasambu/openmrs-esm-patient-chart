@@ -100,12 +100,7 @@ function useCreateMedicationOrderFormSchema() {
           })
         : z.string().nullish(),
       startDate: z.date(),
-      frequency: z.object(
-        { ...comboSchema },
-        {
-          invalid_type_error: t('selectFrequencyErrorMessage', 'Frequency is required'),
-        },
-      ),
+      frequency: z.object({ ...comboSchema }).nullable(),
     };
 
     const outpatientDrugOrderFields = {
@@ -170,7 +165,23 @@ function useCreateMedicationOrderFormSchema() {
       frequency: z.object(comboSchema).nullable(),
     });
 
-    return z.discriminatedUnion('isFreeTextDosage', [nonFreeTextDosageSchema, freeTextDosageSchema]);
+    const discriminatedSchema = z.discriminatedUnion('isFreeTextDosage', [
+      nonFreeTextDosageSchema,
+      freeTextDosageSchema,
+    ]);
+
+    return discriminatedSchema.superRefine((data, ctx) => {
+      const isAsNeeded = data.asNeeded === true;
+      const hasFrequency = !!data.frequency;
+
+      if (!isAsNeeded && !hasFrequency) {
+        ctx.addIssue({
+          path: ['frequency'],
+          code: z.ZodIssueCode.custom,
+          message: t('selectFrequencyErrorMessage', 'Frequency is required'),
+        });
+      }
+    });
   }, [requireIndication, requireOutpatientQuantity, t]);
 
   return schema;
